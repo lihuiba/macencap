@@ -20,9 +20,11 @@ ebt_macdecap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 		/* unable to extract a mac header */
 		return EBT_DROP;
 	}
-	skb_reset_mac_header(skb);
-	skb_reset_transport_header(skb);
-	skb_reset_network_header(skb);
+	//skb->mac_header = skb->network_header;
+	skb->mac_header += ETH_HLEN;
+	skb->transport_header += ETH_HLEN;
+	skb->network_header += ETH_HLEN;
+	skb->protocol = eth_type_trans(skb, skb->dev);
 	info = par->targinfo;
 	return info->target;
 }
