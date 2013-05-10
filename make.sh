@@ -5,7 +5,7 @@ include=$kernel/include/linux/netfilter_bridge
 echo "using kernel from '$kernel'"
 
 if [ $1 == "link" ]; then
-	for file in ebt_macencap.h ebt_macdecap.h; do
+	for file in ebt_macencap.h ebt_macdecap.h ebt_msroute.h; do
 		target="$include/$file"
 		if [ ! -e $target ]; then
 			ln -v `pwd`/$file $target -s

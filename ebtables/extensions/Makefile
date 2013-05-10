@@ -1,7 +1,7 @@
 #! /usr/bin/make
 
 EXT_FUNC+=802_3 nat arp arpreply ip ip6 standard log redirect vlan mark_m mark \
-          pkttype stp among limit ulog nflog macencap macdecap
+          pkttype stp among limit ulog nflog macencap macdecap dumpskb
 EXT_TABLES+=filter nat broute
 EXT_OBJS+=$(foreach T,$(EXT_FUNC), extensions/ebt_$(T).o)
 EXT_OBJS+=$(foreach T,$(EXT_TABLES), extensions/ebtable_$(T).o)

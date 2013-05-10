@@ -1,4 +1,4 @@
-obj-m := ebt_macencap.o ebt_macdecap.o
+obj-m := ebt_macencap.o ebt_macdecap.o ebt_msroute.o ebt_dumpskb.o
 
 fakeall :
 	sh make.sh
