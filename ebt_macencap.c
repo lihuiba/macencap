@@ -36,18 +36,9 @@ ebt_macencap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 	skb->len += ETH_HLEN;
 	skb->data_len += ETH_HLEN;
 	skb->truesize += ETH_HLEN;
-	memcpy(skb->mac_header, &info->header, ETH_HLEN);
 
-	//skb->mac_header -= ETH_HELN;
-	//skb_reset_mac_header(skb);	// mac_header==data
-	//skb->protocol = eth_type_trans(skb, skb->dev);  // implicitly reset mac header and pull a ETH_HLEN length
-	//skb_reset_network_header(skb);
-	//skb_reset_mac_len(skb);
-	//skb->encapsulation
-	//skb_set_inner_transport_header
-	//skb_set_inner_network_header
-	
 	info = par->targinfo;
+	memcpy(skb->mac_header, &info->header, ETH_HLEN);
 	return info->target;
 }
 
