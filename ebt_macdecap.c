@@ -16,15 +16,18 @@ ebt_macdecap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 {
 	const struct ebt_macdecap_info *info;
 
-	if (!pskb_pull(skb, ETH_HLEN)) {
+	if (skb_headlen(skb)<ETH_HLEN)
+	{
 		/* unable to extract a mac header */
 		return EBT_DROP;
 	}
-	//skb->mac_header = skb->network_header;
-	skb->mac_header += ETH_HLEN;
+
+	skb->protocol = eth_type_trans(skb, skb->dev);		// reset mac_header and pull a ETH_HLEN
 	skb->transport_header += ETH_HLEN;
 	skb->network_header += ETH_HLEN;
-	skb->protocol = eth_type_trans(skb, skb->dev);
+	//skb->protocol = info->header.h_proto;
+	//skb->data_len -= ETH_HLEN;	// data_len is the length of fragment part
+
 	info = par->targinfo;
 	return info->target;
 }

@@ -14,31 +14,28 @@
 static unsigned int
 ebt_macencap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 {
-	struct ethhdr* newheader;
 	const struct ebt_macencap_info *info;
-	unsigned int delta;
 
 	if (!skb_make_writable(skb, 0))
 		return EBT_DROP;
 
-	//delta = skb->data - skb_mac_header(skb) + ETH_HLEN;
 	if (skb_headroom(skb) < ETH_HLEN) {
 		/* no enough space for a new mac header */
 		/* TODO: re-allocate a new skb */
 		return EBT_DROP;
 	}
 
+	info = par->targinfo;
 	skb->mac_header -= ETH_HLEN;
 	skb->data -= ETH_HLEN;
 	skb->transport_header -= ETH_HLEN;
 	skb->network_header -= ETH_HLEN;
 	skb->protocol = info->header.h_proto;
 	skb->len += ETH_HLEN;
-	skb->data_len += ETH_HLEN;
-	skb->truesize += ETH_HLEN;
+	//skb->data_len += ETH_HLEN;	// data_len is the length of fragment part
+	//skb->truesize += ETH_HLEN;	// sizeof underlying buffer (byte[])
 
-	info = par->targinfo;
-	memcpy(skb->mac_header, &info->header, ETH_HLEN);
+	memcpy(skb_mac_header(skb), &info->header, ETH_HLEN);
 	return info->target;
 }
 
