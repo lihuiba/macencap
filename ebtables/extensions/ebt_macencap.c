@@ -143,9 +143,9 @@ static void final_check(const struct ebt_u_entry *entry,
 	} else if (BASE_CHAIN && info->target == EBT_RETURN) {
 		ebt_print_error("--macencap-target RETURN not allowed on base chain");
 	} else {
-		CLEAR_BASE_CHAIN_BIT;
-		if (strcmp(name, "nat") || hookmask & ~(1 << NF_BR_PRE_ROUTING))
-			ebt_print_error("macencap only allowed in PREROUTING");
+//		CLEAR_BASE_CHAIN_BIT;
+//		if (strcmp(name, "nat") || hookmask & ~(1 << NF_BR_PRE_ROUTING))
+//			ebt_print_error("macencap only allowed in PREROUTING");
 	}
 }
 
