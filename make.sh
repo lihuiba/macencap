@@ -17,4 +17,4 @@ if [ $1 == "link" ]; then
 fi
 
 make -C $kernel modules M=$PWD
-make -C ebtables/
+#make -C ebtables/
