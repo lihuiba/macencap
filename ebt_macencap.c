@@ -20,19 +20,22 @@ ebt_macencap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 	if (!skb_make_writable(skb, 0))
 		return EBT_DROP;
 
-	if (skb_headroom(skb) < ETH_HLEN) {
+	if (skb_headroom(skb) < ETH_HLEN*2) {
 		/* no enough space for a new mac header */
 		/* TODO: re-allocate a new skb */
 		return EBT_DROP;
 	}
 
-	header = (struct ethhdr*)skb_push(skb, ETH_HLEN);
-	skb_reset_mac_header(skb);
-	skb_reset_transport_header(skb);
-	skb_reset_network_header(skb);
-	info = par->targinfo;
-	memcpy(header, &info->header, ETH_HLEN);
+	//skb->encapsulation
+	//skb_set_inner_transport_header
+	//skb_set_inner_network_header
 
+	header = (struct ethhdr*)skb_push(skb, ETH_HLEN*2);
+	memcpy(header, &info->header, ETH_HLEN);
+	skb->protocol = eth_type_trans(skb, skb->dev);  // implicitly reset mac header and pull a ETH_HLEN length
+	skb_reset_network_header(skb);
+	
+	info = par->targinfo;
 	return info->target;
 }
 
