@@ -1,5 +1,5 @@
 #obj-m := ebt_macencap.o ebt_macdecap.o ebt_msroute.o ebt_dumpskb.o
-obj-m := config.o
+obj-m := macache.o
 
 fakeall :
 	sh make.sh
