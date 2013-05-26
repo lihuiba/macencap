@@ -9,12 +9,15 @@
 #include <linux/module.h>
 #include <linux/netfilter/x_tables.h>
 #include <linux/netfilter_bridge/ebtables.h>
-#include <linux/netfilter_bridge/ebt_macencap.h>
+#include "macache.h"
+#include "ebt_macencap.h"
 
 static unsigned int
 ebt_macencap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 {
+	u64 mac64;
 	const struct ebt_macencap_info *info;
+	const struct ethhdr* old_header = eth_hdr(skb);
 
 	if (!skb_make_writable(skb, 0))
 		return EBT_DROP;
@@ -32,10 +35,32 @@ ebt_macencap_tg(struct sk_buff *skb, const struct xt_target_param *par)
 	skb->network_header -= ETH_HLEN;
 	skb->protocol = info->header.h_proto;
 	skb->len += ETH_HLEN;
-	//skb->data_len += ETH_HLEN;	// data_len is the length of fragment part
-	//skb->truesize += ETH_HLEN;	// sizeof underlying buffer (byte[])
 
-	memcpy(skb_mac_header(skb), &info->header, ETH_HLEN);
+	//memcpy(skb_mac_header(skb), &info->header, ETH_HLEN);
+	mac64 = mac2u64(info->header.h_dest);
+	if (mac64 == 0)
+	{
+		char* mac = macache_get(old_header->h_dest);
+		if (mac != NULL)
+			mac64 = mac2u64(mac);
+		else
+		{
+			mac64 = 0xffffffffffff;		//broadcast address
+			skb->pkt_type = PACKET_BROADCAST;
+		}
+	}
+	mac_setu64(eth_hdr(skb)->h_dest, mac64);
+
+	mac64 = mac2u64(info->header.h_source);
+//	if (unlikely(mac64 == 0))
+//	{
+//		mac64 = mac2u64(par->in->br_port->br->dev->dev_addr);
+//		mac_setu64((char*)info->header.h_source, mac64);
+//	}
+	mac_setu64(eth_hdr(skb)->h_source, mac64);
+
+	eth_hdr(skb)->h_proto = info->header.h_proto;
+
 	return info->target;
 }
 

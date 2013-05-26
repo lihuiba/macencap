@@ -1,6 +1,6 @@
 #include <linux/module.h>
-//#include <linux/if_eth.h>
 #include <linux/hash.h>
+#include "macache.h"
 
 #define HASH_MAC_BITS 10
 #define HASH_MAC_BUCKETS (1<<HASH_MAC_BITS)
@@ -21,17 +21,12 @@ struct mc_record
 
 static struct mc_record macache[HASH_MAC_BUCKETS][HASH_MAC_BUCKET_SIZE];
 
-static inline u64 mac2u64(char* mac)
-{
-	return (*(u64*)mac) & 0xffffffffffff;
-}
-
 static inline u32 hash_mac(u64 mac64)
 {
 	return (u32)hash_64(mac64, HASH_MAC_BITS);
 }
 
-void macache_put(char* key, char* value)
+void macache_put(const char* key, char* value)
 {
 	int i;
 	u64 key64 = mac2u64(key);
@@ -58,7 +53,7 @@ void macache_put(char* key, char* value)
 }
 EXPORT_SYMBOL(macache_put);
 
-char* macache_get(char* key)
+char* macache_get(const char* key)
 {
 	int i;
 	u64 key64 = mac2u64(key);
